@@ -36,24 +36,27 @@ fi
 
 # Select distro
 echo -e "${CYAN}Select Linux Distribution:${NC}"
-echo -e "  ${GREEN}1${NC}) Ubuntu ${YELLOW}[recommended]${NC}"
-echo -e "  ${GREEN}2${NC}) Debian"
+echo ""
+echo -e "  ${GREEN}1${NC}) Ubuntu    - Compatible ${YELLOW}[recommended]${NC}"
+echo -e "  ${GREEN}2${NC}) Debian    - Stable"
+echo -e "  ${GREEN}3${NC}) Arch      - I use Arch btw"
 echo ""
 read -p "Select [default: 1]: " distro_choice
 
 case $distro_choice in
     2) DISTRO="debian" ;;
+    3) DISTRO="archlinux" ;;
     *) DISTRO="ubuntu" ;;
 esac
 
 echo ""
-echo -e "${GREEN}Selected: ${DISTRO^}${NC}"
+echo -e "${GREEN}Selected: ${DISTRO}${NC}"
 echo ""
 
 # Step 1: Update Termux
 echo -e "${CYAN}[1/4]${NC} Updating Termux..."
-yes | pkg update -y 2>/dev/null
-yes | pkg upgrade -y 2>/dev/null || true
+yes | pkg update 2>/dev/null || true
+yes | pkg upgrade 2>/dev/null || true
 echo -e "${GREEN}[OK]${NC} Termux updated"
 echo ""
 
@@ -68,14 +71,14 @@ echo ""
 
 # Step 3: Install distro
 if proot-distro list 2>/dev/null | grep -q "$DISTRO"; then
-    echo -e "${CYAN}[3/4]${NC} ${DISTRO^} already installed ${GREEN}✓${NC}"
+    echo -e "${CYAN}[3/4]${NC} ${DISTRO} already installed ${GREEN}✓${NC}"
 else
-    echo -e "${CYAN}[3/4]${NC} Installing ${DISTRO^} (this takes a few minutes)..."
+    echo -e "${CYAN}[3/4]${NC} Installing ${DISTRO} (this takes a few minutes)..."
     proot-distro install $DISTRO || {
-        echo -e "${RED}[ERROR]${NC} Failed to install ${DISTRO^}"
+        echo -e "${RED}[ERROR]${NC} Failed to install ${DISTRO}"
         exit 1
     }
-    echo -e "${GREEN}[OK]${NC} ${DISTRO^} installed"
+    echo -e "${GREEN}[OK]${NC} ${DISTRO} installed"
 fi
 echo ""
 
@@ -98,15 +101,14 @@ echo -e "${GREEN}═════════════════════
 echo -e "${GREEN}  Installation Complete!${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════${NC}"
 echo ""
-echo -e "  Distro:   ${CYAN}${DISTRO^}${NC}"
-echo -e "  MCMS:     ${CYAN}~/mcms/mcms.sh${NC}"
+echo -e "  Distro: ${CYAN}${DISTRO}${NC}"
+echo -e "  MCMS:   ${CYAN}~/mcms/mcms.sh${NC}"
 echo ""
-echo -e "  ${YELLOW}Run again later:${NC}"
-echo -e "  ${CYAN}proot-distro login $DISTRO${NC}"
+echo -e "  ${YELLOW}To run MCMS:${NC}"
 echo -e "  ${CYAN}cd ~/mcms && ./mcms.sh${NC}"
 echo ""
-echo -e "  ${YELLOW}Starting MCMS now...${NC}"
+echo -e "  ${YELLOW}Logging into ${DISTRO}...${NC}"
 echo ""
 
-# Login and run MCMS
-proot-distro login $DISTRO -- bash -c "cd ~/mcms && ./mcms.sh"
+# Login to distro
+proot-distro login $DISTRO
