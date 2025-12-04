@@ -35,8 +35,9 @@ fi
 # Step 1: Update Termux
 echo -e "${CYAN}[1/3]${NC} Updating Termux..."
 echo ""
-pkg update -y
-pkg upgrade -y
+# Auto-answer Y to all prompts during update
+yes | pkg update
+yes | pkg upgrade
 echo ""
 echo -e "${GREEN}[OK]${NC} Termux updated"
 echo ""
