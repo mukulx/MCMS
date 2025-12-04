@@ -53,21 +53,19 @@ echo ""
 # Step 3: Select distro - read from /dev/tty to handle piped input
 echo -e "${CYAN}[3/3]${NC} Select Linux Distribution:"
 echo ""
-echo -e "  ${GREEN}1${NC}) Ubuntu    - Compatible ${YELLOW}[recommended]${NC}"
-echo -e "  ${GREEN}2${NC}) Debian    - Stable"
-echo -e "  ${GREEN}3${NC}) Arch      - I use Arch btw"
+echo -e "  ${GREEN}1${NC}) Ubuntu - Compatible ${YELLOW}[recommended]${NC}"
+echo -e "  ${GREEN}2${NC}) Debian - Stable"
 echo ""
 
 # Read from terminal directly
-read -p "Select [1-3]: " distro_choice </dev/tty
+read -p "Select [1-2]: " distro_choice </dev/tty
 
 case $distro_choice in
     1) DISTRO="ubuntu" ;;
     2) DISTRO="debian" ;;
-    3) DISTRO="archlinux" ;;
     *)
         echo ""
-        echo -e "${RED}Invalid choice. Please run again and select 1, 2, or 3${NC}"
+        echo -e "${RED}Invalid choice. Please run again and select 1 or 2${NC}"
         exit 1
         ;;
 esac
