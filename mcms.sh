@@ -11,7 +11,7 @@
 set -e
 
 # Version
-MCMS_VERSION="1.1.0"
+MCMS_VERSION="1.0.0"
 MCMS_REPO="https://github.com/mukulx/MCMS"
 MCMS_RAW="https://raw.githubusercontent.com/mukulx/MCMS/main/mcms.sh"
 
@@ -1104,7 +1104,7 @@ quick_setup() {
     
     echo -e "${CYAN}Starting server...${NC}"
     echo ""
-    ./start.sh
+    ./start-background.sh
 }
 
 custom_setup() {
@@ -1157,9 +1157,9 @@ custom_setup() {
     
     show_completion
     
-    echo -e "${CYAN}Starting server...${NC}"
+    echo -e "${CYAN}Starting server (with playit if configured)...${NC}"
     echo ""
-    ./start.sh
+    ./start-background.sh
 }
 
 
@@ -1396,7 +1396,7 @@ quick_purpur() {
     
     echo -e "${CYAN}Starting server...${NC}"
     echo ""
-    ./start.sh
+    ./start-background.sh
 }
 
 quick_folia() {
@@ -1436,7 +1436,7 @@ quick_folia() {
     
     echo -e "${CYAN}Starting server...${NC}"
     echo ""
-    ./start.sh
+    ./start-background.sh
 }
 
 # ─────────────────────────────────────────────────────────────────────
