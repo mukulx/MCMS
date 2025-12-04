@@ -11,7 +11,7 @@
 set -e
 
 # Version
-MCMS_VERSION="1.0.0"
+MCMS_VERSION="1.1.0"
 MCMS_REPO="https://github.com/mukulx/MCMS"
 MCMS_RAW="https://raw.githubusercontent.com/mukulx/MCMS/main/mcms.sh"
 
