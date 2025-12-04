@@ -573,7 +573,14 @@ PLAYITBG
             log_info "After setup, press Ctrl+C to continue"
             echo ""
             playit
-            PLAYIT_CONFIGURED=true
+            
+            # Check if configured after running
+            if check_playit_configured; then
+                PLAYIT_CONFIGURED=true
+                log_success "playit.gg configured successfully!"
+            else
+                log_warn "playit may not be fully configured. Run ./start-playit.sh to complete setup."
+            fi
         else
             echo ""
             log_info "Run './start-playit.sh' to setup tunnels later"
@@ -1045,25 +1052,34 @@ show_completion() {
     fi
     
     echo ""
-    echo -e "${CYAN}Commands (run from this directory):${NC}"
-    echo -e "  Start:        ${GREEN}./start.sh${NC}"
-    echo -e "  Background:   ${GREEN}./start-background.sh${NC}"
-    echo -e "  Attach:       ${GREEN}screen -r minecraft${NC}"
+    echo -e "${CYAN}To start the server:${NC}"
+    echo ""
+    echo -e "  ${YELLOW}cd $SERVER_DIR${NC}"
     
-    if [ "$ENABLE_PLAYIT" = true ]; then
-        echo -e "  playit:       ${GREEN}./start-playit.sh${NC}"
-        echo -e "  playit (bg):  ${GREEN}./start-playit-background.sh${NC}"
+    if [ "$ENABLE_PLAYIT" = true ] && check_playit_configured; then
+        echo -e "  ${YELLOW}./start-playit-background.sh${NC}  ${GREEN}# Start playit tunnel${NC}"
     fi
+    
+    echo -e "  ${YELLOW}./start.sh${NC}                    ${GREEN}# Start server${NC}"
+    
+    echo ""
+    echo -e "${CYAN}Or use background mode:${NC}"
+    echo -e "  ${YELLOW}./start-background.sh${NC}         ${GREEN}# Starts both server & playit${NC}"
+    
+    echo ""
+    echo -e "${CYAN}Screen commands:${NC}"
+    echo -e "  ${GREEN}screen -r minecraft${NC}  - Attach to server"
+    [ "$ENABLE_PLAYIT" = true ] && echo -e "  ${GREEN}screen -r playit${NC}     - Attach to playit"
+    echo -e "  ${GREEN}Ctrl+A then D${NC}        - Detach from screen"
+    echo -e "  ${GREEN}screen -ls${NC}           - List screens"
     
     echo ""
     echo -e "${CYAN}Connect:${NC}"
     echo -e "  LAN:     ${GREEN}localhost:$JAVA_PORT${NC}"
     [ "$ENABLE_GEYSER" = true ] && echo -e "  Bedrock: ${GREEN}localhost:$BEDROCK_PORT${NC}"
     if [ "$ENABLE_PLAYIT" = true ]; then
-        echo -e "  Remote:  ${YELLOW}See playit.gg dashboard for public IP${NC}"
+        echo -e "  Remote:  ${YELLOW}Check playit.gg dashboard for public IP${NC}"
     fi
-    echo ""
-    echo -e "${CYAN}Current directory:${NC} ${GREEN}$(pwd)${NC}"
     echo ""
 }
 
@@ -1101,10 +1117,6 @@ quick_setup() {
     optimize_mobile
     
     show_completion
-    
-    echo -e "${CYAN}Starting server...${NC}"
-    echo ""
-    ./start-background.sh
 }
 
 custom_setup() {
@@ -1156,10 +1168,6 @@ custom_setup() {
     fi
     
     show_completion
-    
-    echo -e "${CYAN}Starting server (with playit if configured)...${NC}"
-    echo ""
-    ./start-background.sh
 }
 
 
@@ -1393,10 +1401,6 @@ quick_purpur() {
     optimize_mobile
     
     show_completion
-    
-    echo -e "${CYAN}Starting server...${NC}"
-    echo ""
-    ./start-background.sh
 }
 
 quick_folia() {
@@ -1433,10 +1437,6 @@ quick_folia() {
     optimize_mobile
     
     show_completion
-    
-    echo -e "${CYAN}Starting server...${NC}"
-    echo ""
-    ./start-background.sh
 }
 
 # ─────────────────────────────────────────────────────────────────────
