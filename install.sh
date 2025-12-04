@@ -4,7 +4,7 @@
 # Termux Proot Distro Installer
 # https://github.com/mukulx/MCMS
 #
-# Install: curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh | bash
+# Install: curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh -o install.sh && bash install.sh
 # ═══════════════════════════════════════════════════════════════════
 
 # Colors
@@ -34,6 +34,7 @@ fi
 
 # Step 1: Update Termux
 echo -e "${CYAN}[1/3]${NC} Updating Termux..."
+echo ""
 pkg update -y
 pkg upgrade -y
 echo ""
@@ -42,26 +43,30 @@ echo ""
 
 # Step 2: Install proot-distro
 echo -e "${CYAN}[2/3]${NC} Installing proot-distro..."
+echo ""
 pkg install -y proot-distro curl
 echo ""
 echo -e "${GREEN}[OK]${NC} proot-distro installed"
 echo ""
 
-# Select distro
+# Step 3: Select distro - read from /dev/tty to handle piped input
 echo -e "${CYAN}[3/3]${NC} Select Linux Distribution:"
 echo ""
 echo -e "  ${GREEN}1${NC}) Ubuntu    - Compatible ${YELLOW}[recommended]${NC}"
 echo -e "  ${GREEN}2${NC}) Debian    - Stable"
 echo -e "  ${GREEN}3${NC}) Arch      - I use Arch btw"
 echo ""
-read -p "Select [1-3]: " distro_choice
+
+# Read from terminal directly
+read -p "Select [1-3]: " distro_choice </dev/tty
 
 case $distro_choice in
     1) DISTRO="ubuntu" ;;
     2) DISTRO="debian" ;;
     3) DISTRO="archlinux" ;;
     *)
-        echo -e "${RED}Invalid choice${NC}"
+        echo ""
+        echo -e "${RED}Invalid choice. Please run again and select 1, 2, or 3${NC}"
         exit 1
         ;;
 esac
@@ -74,7 +79,8 @@ echo ""
 if proot-distro list 2>/dev/null | grep -q "$DISTRO"; then
     echo -e "${YELLOW}${DISTRO} is already installed${NC}"
 else
-    echo -e "Installing ${DISTRO}..."
+    echo "Installing ${DISTRO}..."
+    echo ""
     proot-distro install $DISTRO || {
         echo -e "${RED}[ERROR]${NC} Failed to install ${DISTRO}"
         exit 1
@@ -88,10 +94,10 @@ echo -e "${GREEN}═════════════════════
 echo ""
 echo -e "  Distro: ${CYAN}${DISTRO}${NC}"
 echo ""
-echo -e "  ${YELLOW}To login:${NC}"
+echo -e "  ${YELLOW}To login later:${NC}"
 echo -e "  ${CYAN}proot-distro login ${DISTRO}${NC}"
 echo ""
-echo -e "  ${YELLOW}Logging in...${NC}"
+echo -e "  ${YELLOW}Logging in now...${NC}"
 echo ""
 
 # Login to distro
