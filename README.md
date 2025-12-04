@@ -13,7 +13,7 @@ curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh -o instal
 This will:
 - Update Termux
 - Install proot-distro
-- Let you choose Ubuntu, Debian, or Arch Linux
+- Let you choose Ubuntu or Debian
 
 ### Step 2: Download MCMS (inside proot)
 
