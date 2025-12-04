@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
 # ═══════════════════════════════════════════════════════════════════
-# MCMS Installer - Minecraft Mobile Server
+# Termux Proot Distro Installer
 # https://github.com/mukulx/MCMS
 #
 # Install: curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh | bash
@@ -15,14 +15,12 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-MCMS_RAW="https://raw.githubusercontent.com/mukulx/MCMS/main/mcms.sh"
-DISTRO="ubuntu"
+DISTRO=""
 
 clear
 echo -e "${CYAN}${BOLD}"
 echo "╔═══════════════════════════════════════════════════════════╗"
-echo "║              MCMS - Minecraft Mobile Server               ║"
-echo "║                      Installer                            ║"
+echo "║            Termux Proot Distro Installer                  ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 echo ""
@@ -34,80 +32,66 @@ if [ ! -d "/data/data/com.termux" ]; then
     exit 1
 fi
 
+# Step 1: Update Termux
+echo -e "${CYAN}[1/3]${NC} Updating Termux..."
+pkg update -y
+pkg upgrade -y
+echo ""
+echo -e "${GREEN}[OK]${NC} Termux updated"
+echo ""
+
+# Step 2: Install proot-distro
+echo -e "${CYAN}[2/3]${NC} Installing proot-distro..."
+pkg install -y proot-distro curl
+echo ""
+echo -e "${GREEN}[OK]${NC} proot-distro installed"
+echo ""
+
 # Select distro
-echo -e "${CYAN}Select Linux Distribution:${NC}"
+echo -e "${CYAN}[3/3]${NC} Select Linux Distribution:"
 echo ""
 echo -e "  ${GREEN}1${NC}) Ubuntu    - Compatible ${YELLOW}[recommended]${NC}"
 echo -e "  ${GREEN}2${NC}) Debian    - Stable"
 echo -e "  ${GREEN}3${NC}) Arch      - I use Arch btw"
 echo ""
-read -p "Select [default: 1]: " distro_choice
+read -p "Select [1-3]: " distro_choice
 
 case $distro_choice in
+    1) DISTRO="ubuntu" ;;
     2) DISTRO="debian" ;;
     3) DISTRO="archlinux" ;;
-    *) DISTRO="ubuntu" ;;
+    *)
+        echo -e "${RED}Invalid choice${NC}"
+        exit 1
+        ;;
 esac
 
 echo ""
 echo -e "${GREEN}Selected: ${DISTRO}${NC}"
 echo ""
 
-# Step 1: Update Termux
-echo -e "${CYAN}[1/4]${NC} Updating Termux..."
-yes | pkg update 2>/dev/null || true
-yes | pkg upgrade 2>/dev/null || true
-echo -e "${GREEN}[OK]${NC} Termux updated"
-echo ""
-
-# Step 2: Install proot-distro
-echo -e "${CYAN}[2/4]${NC} Installing proot-distro..."
-pkg install -y proot-distro curl 2>/dev/null || {
-    echo -e "${RED}[ERROR]${NC} Failed to install proot-distro"
-    exit 1
-}
-echo -e "${GREEN}[OK]${NC} proot-distro installed"
-echo ""
-
-# Step 3: Install distro
+# Install distro
 if proot-distro list 2>/dev/null | grep -q "$DISTRO"; then
-    echo -e "${CYAN}[3/4]${NC} ${DISTRO} already installed ${GREEN}✓${NC}"
+    echo -e "${YELLOW}${DISTRO} is already installed${NC}"
 else
-    echo -e "${CYAN}[3/4]${NC} Installing ${DISTRO} (this takes a few minutes)..."
+    echo -e "Installing ${DISTRO}..."
     proot-distro install $DISTRO || {
         echo -e "${RED}[ERROR]${NC} Failed to install ${DISTRO}"
         exit 1
     }
-    echo -e "${GREEN}[OK]${NC} ${DISTRO} installed"
 fi
-echo ""
 
-# Step 4: Download MCMS
-echo -e "${CYAN}[4/4]${NC} Downloading MCMS..."
-proot-distro login $DISTRO -- bash -c "
-    mkdir -p ~/mcms
-    cd ~/mcms
-    curl -sL '$MCMS_RAW' -o mcms.sh
-    chmod +x mcms.sh
-" || {
-    echo -e "${RED}[ERROR]${NC} Failed to download MCMS"
-    exit 1
-}
-echo -e "${GREEN}[OK]${NC} MCMS downloaded"
 echo ""
-
-# Done
 echo -e "${GREEN}════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}  Installation Complete!${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "  Distro: ${CYAN}${DISTRO}${NC}"
-echo -e "  MCMS:   ${CYAN}~/mcms/mcms.sh${NC}"
 echo ""
-echo -e "  ${YELLOW}To run MCMS:${NC}"
-echo -e "  ${CYAN}cd ~/mcms && ./mcms.sh${NC}"
+echo -e "  ${YELLOW}To login:${NC}"
+echo -e "  ${CYAN}proot-distro login ${DISTRO}${NC}"
 echo ""
-echo -e "  ${YELLOW}Logging into ${DISTRO}...${NC}"
+echo -e "  ${YELLOW}Logging in...${NC}"
 echo ""
 
 # Login to distro
