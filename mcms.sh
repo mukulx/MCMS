@@ -454,7 +454,13 @@ install_playit() {
 
 check_playit_configured() {
     # Check if playit has been configured (has a toml config)
-    [ -f "$HOME/.config/playit/playit.toml" ] || [ -f "/root/.config/playit/playit.toml" ]
+    # Check multiple possible locations
+    [ -f "$HOME/.config/playit/playit.toml" ] || \
+    [ -f "/root/.config/playit/playit.toml" ] || \
+    [ -f "$HOME/.playit/playit.toml" ] || \
+    [ -f "/root/.playit/playit.toml" ] || \
+    [ -d "$HOME/.config/playit" ] || \
+    [ -d "/root/.config/playit" ]
 }
 
 setup_playit() {
@@ -696,7 +702,7 @@ java \
 STARTSCRIPT
     chmod +x "$SERVER_DIR/start.sh"
     
-    # Background script
+    # Background script with playit support
     cat > "$SERVER_DIR/start-background.sh" << 'BGSCRIPT'
 #!/bin/bash
 cd "$(dirname "$0")"
@@ -708,42 +714,63 @@ if ! command -v screen &>/dev/null; then
     exit 1
 fi
 
-# Check if already running
+# Check if server already running
 if screen -list | grep -q "\.minecraft"; then
     echo ""
     echo "Server is already running!"
     echo "Attach with: screen -r minecraft"
     echo ""
-    exit 1
-fi
-
-# Start server in screen session
-echo ""
-echo "Starting Minecraft server in background..."
-screen -dmS minecraft bash -c './start.sh; exec bash'
-
-# Wait a moment and check if it started
-sleep 2
-
-if screen -list | grep -q "\.minecraft"; then
-    echo ""
-    echo "════════════════════════════════════════════════"
-    echo "  Server started in background!"
-    echo "════════════════════════════════════════════════"
-    echo ""
-    echo "Commands:"
-    echo "  Attach to console:  screen -r minecraft"
-    echo "  Detach from console: Ctrl+A then D"
-    echo "  Stop server:        Type 'stop' in console"
-    echo "  List screens:       screen -ls"
-    echo ""
 else
-    echo ""
-    echo "Error: Failed to start server!"
-    echo "Try running ./start.sh directly to see errors."
-    echo ""
-    exit 1
+    # Start server in screen session
+    echo "Starting Minecraft server..."
+    screen -dmS minecraft bash -c './start.sh; exec bash'
+    sleep 2
+    
+    if screen -list | grep -q "\.minecraft"; then
+        echo "Server started! (screen: minecraft)"
+    else
+        echo "Error: Failed to start server!"
+        echo "Try running ./start.sh directly to see errors."
+        exit 1
+    fi
 fi
+
+# Check if playit is configured and start it
+PLAYIT_CONFIGURED=false
+if [ -d "$HOME/.config/playit" ] || [ -d "/root/.config/playit" ] || \
+   [ -f "$HOME/.config/playit/playit.toml" ] || [ -f "/root/.config/playit/playit.toml" ]; then
+    PLAYIT_CONFIGURED=true
+fi
+
+if [ "$PLAYIT_CONFIGURED" = true ] && command -v playit &>/dev/null; then
+    if screen -list | grep -q "\.playit"; then
+        echo "playit already running! (screen: playit)"
+    else
+        echo "Starting playit.gg tunnel..."
+        screen -dmS playit playit
+        sleep 2
+        
+        if screen -list | grep -q "\.playit"; then
+            echo "playit started! (screen: playit)"
+        else
+            echo "Warning: Failed to start playit"
+        fi
+    fi
+fi
+
+echo ""
+echo "════════════════════════════════════════════════"
+echo "  Services Running:"
+echo "════════════════════════════════════════════════"
+echo ""
+screen -list | grep -E "\.(minecraft|playit)" || echo "  No screens found"
+echo ""
+echo "Commands:"
+echo "  Server console:  screen -r minecraft"
+echo "  playit console:  screen -r playit"
+echo "  Detach:          Ctrl+A then D"
+echo "  List screens:    screen -ls"
+echo ""
 BGSCRIPT
     chmod +x "$SERVER_DIR/start-background.sh"
     
@@ -1008,9 +1035,9 @@ show_completion() {
     if [ "$ENABLE_PLAYIT" = true ]; then
         echo ""
         echo -e "${CYAN}Port Forwarding:${NC} ${GREEN}playit.gg${NC}"
-        if [ "$PLAYIT_CONFIGURED" = true ]; then
-            echo -e "  Status: ${GREEN}Configured${NC}"
-            echo -e "  ${YELLOW}Check playit.gg dashboard for your public IP!${NC}"
+        if check_playit_configured; then
+            echo -e "  Status: ${GREEN}Configured ✓${NC}"
+            echo -e "  ${GREEN}playit will auto-start with ./start-background.sh${NC}"
         else
             echo -e "  Status: ${YELLOW}Not configured yet${NC}"
             echo -e "  Run ${GREEN}./start-playit.sh${NC} to setup"
@@ -1226,12 +1253,23 @@ show_status() {
     
     if command -v playit &>/dev/null; then
         if check_playit_configured; then
-            echo -e "  playit:   ${GREEN}Configured${NC}"
+            echo -e "  playit:   ${GREEN}Configured ✓${NC}"
         else
             echo -e "  playit:   ${YELLOW}Installed (not configured)${NC}"
         fi
     else
         echo -e "  playit:   ${YELLOW}Not installed${NC}"
+    fi
+    
+    # Show running screens
+    if command -v screen &>/dev/null; then
+        local screens=$(screen -list 2>/dev/null | grep -E "\.(minecraft|playit)" | wc -l)
+        if [ "$screens" -gt 0 ]; then
+            echo ""
+            echo -e "${CYAN}Running:${NC}"
+            screen -list 2>/dev/null | grep "\.minecraft" && echo -e "  Server:   ${GREEN}Running${NC}"
+            screen -list 2>/dev/null | grep "\.playit" && echo -e "  playit:   ${GREEN}Running${NC}"
+        fi
     fi
     
     echo ""
