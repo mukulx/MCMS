@@ -2,19 +2,32 @@
 
 Run a Minecraft server on your Android phone.
 
-## Install
+## Installation
+
+### Step 1: Install Proot Distro
 
 ```bash
-curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/install.sh -o install.sh && bash install.sh
 ```
 
-## Features
+This will:
+- Update Termux
+- Install proot-distro
+- Let you choose Ubuntu, Debian, or Arch Linux
 
-- Paper, Purpur, Folia servers
-- Geyser + Floodgate (Bedrock support)
-- playit.gg (free remote access)
-- Auto Java installation
-- Mobile optimized
+### Step 2: Download MCMS (inside proot)
+
+```bash
+mkdir -p ~/mcms && cd ~/mcms
+curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/mcms.sh -o mcms.sh
+chmod +x mcms.sh
+```
+
+### Step 3: Run MCMS
+
+```bash
+./mcms.sh
+```
 
 ## Run Again
 
@@ -23,19 +36,26 @@ proot-distro login ubuntu
 cd ~/mcms && ./mcms.sh
 ```
 
-## Update
+## Update MCMS
 
 ```bash
-proot-distro login ubuntu
 cd ~/mcms
 curl -sL https://raw.githubusercontent.com/mukulx/MCMS/main/mcms.sh -o mcms.sh
 ```
+
+## Features
+
+- **Paper, Purpur, Folia** - Choose your server software
+- **Geyser + Floodgate** - Bedrock player support
+- **playit.gg** - Free remote access
+- **Auto Java** - Installs Java 17/21
+- **Mobile Optimized** - Aikar's flags
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `./mcms.sh` | Menu |
+| `./mcms.sh` | Interactive menu |
 | `./mcms.sh --quick` | Quick Paper setup |
 | `./mcms.sh --purpur` | Purpur setup |
 | `./mcms.sh --folia` | Folia setup |
